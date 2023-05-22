@@ -69,7 +69,7 @@ pub fn setup_level(
     let player_spawn = PlayerSpawn{pos: Position{x: 0.0, y: 0.5}};
     let enemy_spawns = vec![EnemySpawn{pos: Position{x: 1.0, y: 0.5}}];
     for (i, spawn) in enemy_spawns.iter().enumerate() {
-        println!("Spawning enemy at: {:?}", spawn);
+        info!("Spawning enemy at: {:?}", spawn);
         commands.spawn(EnemyBundle{
             name: Name(format!("default_enemy_{i}").to_string()),
             hp: Health(100.0),
