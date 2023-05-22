@@ -1,19 +1,13 @@
-use bevy::{
-    prelude::*,
-    pbr::PbrBundle,
-};
-
-use crate::common::Position;
-
+use bevy::{pbr::PbrBundle, prelude::*};
 
 #[derive(Component, Debug)]
 pub struct PlayerSpawn {
-    pub pos: Position,
+    pub pos: Transform,
 }
 
 #[derive(Component, Debug)]
 pub struct EnemySpawn {
-    pub pos: Position,
+    pub pos: Transform,
 }
 
 #[derive(Component)]
@@ -38,16 +32,15 @@ struct Health(f32);
 struct GameState {}
 
 #[derive(Component)]
-struct Player;
+pub struct Player;
 
 #[derive(Component)]
-struct Enemy;
+pub struct Enemy;
 
 #[derive(Bundle)]
 struct PlayerBundle {
     name: Name,
     hp: Health,
-    pos: Position,
     body: PbrBundle,
     _p: Player,
 }
@@ -56,7 +49,6 @@ struct PlayerBundle {
 struct EnemyBundle {
     name: Name,
     hp: Health,
-    pos: Position,
     body: PbrBundle,
     _e: Enemy,
 }
@@ -66,31 +58,33 @@ pub fn setup_level(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let player_spawn = PlayerSpawn{pos: Position{x: 0.0, y: 0.5}};
-    let enemy_spawns = vec![EnemySpawn{pos: Position{x: 1.0, y: 0.5}}];
+    let player_spawn = PlayerSpawn {
+        pos: Transform::from_xyz(0.0, 0.25, 0.0),
+    };
+    let enemy_spawns = vec![EnemySpawn {
+        pos: Transform::from_xyz(1.0, 0.5, 0.0),
+    }];
     for (i, spawn) in enemy_spawns.iter().enumerate() {
         info!("Spawning enemy at: {:?}", spawn);
-        commands.spawn(EnemyBundle{
+        commands.spawn(EnemyBundle {
             name: Name(format!("default_enemy_{i}").to_string()),
             hp: Health(100.0),
-            pos: Position{x: 0.0, y: 0.0},
             body: PbrBundle {
                 mesh: meshes.add(Mesh::from(shape::Cube { size: 0.5 })),
                 material: materials.add(Color::rgb(0.8, 0.7, 0.0).into()),
-                transform: Transform::from_xyz(spawn.pos.x, spawn.pos.y, 0.0),
+                transform: spawn.pos,
                 ..default()
             },
             _e: Enemy,
         });
     }
-    commands.spawn(PlayerBundle{
+    commands.spawn(PlayerBundle {
         name: Name("default_player".to_string()),
         hp: Health(100.0),
-        pos: Position{x: 0.0, y: 0.0},
         body: PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 0.5 })),
             material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
-            transform: Transform::from_xyz(player_spawn.pos.x, player_spawn.pos.y, 0.0),
+            transform: player_spawn.pos,
             ..default()
         },
         _p: Player,
@@ -103,7 +97,8 @@ pub fn setup_level(
             ..default()
         },
         player_spawn: player_spawn,
-        enemy_spawn: EnemySpawnSet{spawns: enemy_spawns},
+        enemy_spawn: EnemySpawnSet {
+            spawns: enemy_spawns,
+        },
     });
 }
-
