@@ -1,7 +1,12 @@
-use bevy::prelude::*;
 use crate::level;
+use bevy::math::vec2;
+use bevy::prelude::*;
+use bevy::render::camera::RenderTarget;
 
 const MOVE_SPEED: f32 = 0.5;
+
+#[derive(Component)]
+pub struct MainCamera;
 
 #[derive(Resource)]
 pub struct KeyMap {
@@ -51,4 +56,31 @@ pub fn keyboard_input_system(
         adjust += transform.right();
     }
     transform.translation += adjust.normalize_or_zero() * MOVE_SPEED * timer.delta_seconds();
+}
+
+pub fn my_cursor_system(
+    windows: Query<&Window>,
+    camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    mut player_position: Query<(&level::Player, &mut Transform)>,
+) {
+    let window = windows.single();
+    let (camera, camera_transform) = camera_q.single();
+    let (_, mut player) = player_position.single_mut();
+    let player_transform = player.translation;
+
+    if let Some(world_position) = window
+        .cursor_position()
+        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+        .map(|ray| {
+            ray.get_point(
+                ray.intersect_plane(
+                    player_transform,
+                    Vec3::Y,
+                )
+                .unwrap(),
+            )
+        })
+    {
+        player.look_at(world_position, Vec3::Y)
+    }
 }
