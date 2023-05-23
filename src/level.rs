@@ -105,10 +105,10 @@ pub fn setup_level(
             ))
             .insert(Collider::cuboid(0.25, 0.25, 0.25))
             .insert(Damping {
-                linear_damping: 0.5,
+                linear_damping: 1.0,
                 angular_damping: 1.0,
             })
-            .insert(GravityScale(0.0))
+            .insert(GravityScale(0.5))
             .insert(Sleeping::disabled())
             .insert(Ccd::enabled());
     }
@@ -129,10 +129,10 @@ pub fn setup_level(
         ))
         .insert(Collider::cuboid(0.25, 0.25, 0.25))
         .insert(Damping {
-            linear_damping: 0.5,
+            linear_damping: 1.0,
             angular_damping: 1.0,
         })
-        .insert(GravityScale(0.0))
+        .insert(GravityScale(0.5))
         .insert(Sleeping::disabled())
         .insert(Ccd::enabled());
     // plane
@@ -148,5 +148,6 @@ pub fn setup_level(
                 spawns: enemy_spawns,
             },
         })
-        .insert(RigidBody::Fixed);
+        .insert(RigidBody::Fixed)
+        .insert(Collider::cuboid(5.0, 0.0, 5.0));
 }
